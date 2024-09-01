@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LSI Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f3f3f3;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .calculator-container {
+            background-color: #eef8f9;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            max-width: 300px;
+            text-align: center;
+        }
+        .calculator-container h1 {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            color: #00796b;
+        }
+        .input-group {
+            margin-bottom: 10px;
+        }
+        .input-group label {
+            display: block;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        .result {
+            font-size: 1.2em;
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .result.green {
+            background-color: #dff0d8;
+            color: #3c763d;
+        }
+        .result.yellow {
+            background-color: #fcf8e3;
+            color: #8a6d3b;
+        }
+        .result.red {
+            background-color: #f2dede;
+            color: #a94442;
+        }
+        .result.purple {
+            background-color: #e0d7f5;
+            color: #663399;
+        }
+        button {
+            background-color: #00796b;
+            color: #fff;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #005a47;
+        }
+    </style>
+</head>
+<body>
+
+<div class="calculator-container">
+    <h1>LSI Calculator</h1>
+    <div class="input-group">
+        <label for="temperature">Water °F</label>
+        <input type="number" id="temperature" placeholder="Enter Temperature">
+    </div>
+    <div class="input-group">
+        <label for="ph">pH</label>
+        <input type="number" step="0.1" id="ph" placeholder="Enter pH">
+    </div>
+    <div class="input-group">
+        <label for="alkalinity">Total Alkalinity (ppm)</label>
+        <input type="number" id="alkalinity" placeholder="Enter Alkalinity">
+    </div>
+    <div class="input-group">
+        <label for="hardness">Calcium Hardness (ppm)</label>
+        <input type="number" id="hardness" placeholder="Enter Hardness">
+    </div>
+    <div class="input-group">
+        <label for="cya">Stabilizer (CYA) (ppm)</label>
+        <input type="number" id="cya" placeholder="Enter CYA">
+    </div>
+    <div class="input-group">
+        <label for="tds">TDS (ppm)</label>
+        <input type="number" id="tds" placeholder="Enter TDS">
+    </div>
+    <button onclick="calculateLSI()">Calculate</button>
+    <div class="result" id="lsiResult">LSI Result: N/A</div>
+</div>
+
+<script>
+    function calculateLSI() {
+        let temp = parseFloat(document.getElementById('temperature').value);
+        let ph = parseFloat(document.getElementById('ph').value);
+        let alkalinity = parseFloat(document.getElementById('alkalinity').value);
+        let hardness = parseFloat(document.getElementById('hardness').value);
+        let cya = parseFloat(document.getElementById('cya').value);
+        let tds = parseFloat(document.getElementById('tds').value);
+
+        if (isNaN(temp) || isNaN(ph) || isNaN(alkalinity) || isNaN(hardness) || isNaN(cya) || isNaN(tds)) {
+            alert('Please fill in all fields.');
+            return;
+        }
+
+        let lsi = ph - ((9.3 + (log10(tds) * 0.4) + (13.12 * log10(temp + 273)) - 34.55 - (log10(alkalinity) * 1.46) - (log10(hardness) * 1.68)));
+        lsi = parseFloat(lsi.toFixed(2));
+
+        let lsiResultElement = document.getElementById('lsiResult');
+        lsiResultElement.innerText = `LSI Result: ${lsi}`;
+
+        lsiResultElement.classList.remove('green', 'yellow', 'red', 'purple');
+        if (lsi > 0.30) {
+            lsiResultElement.classList.add('purple');
+        } else if (lsi >= 0.00 && lsi <= 0.30) {
+            lsiResultElement.classList.add('green');
+        } else if (lsi >= -0.30 && lsi < 0.00) {
+            lsiResultElement.classList.add('yellow');
+        } else {
+            lsiResultElement.classList.add('red');
+        }
+    }
+
+    function log10(val) {
+        return Math.log(val) / Math.LN10;
+    }
+</script>
+
+</body>
+</html>

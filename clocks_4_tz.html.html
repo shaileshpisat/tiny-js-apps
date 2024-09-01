@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Clock App</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.33/moment-timezone-with-data.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+        .clock {
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .time {
+            font-size: 2em;
+            margin: 10px 0;
+        }
+        .city-search {
+            width: 100%;
+            padding: 5px;
+            margin-top: 10px;
+        }
+        .city-list {
+            max-height: 150px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            display: none;
+        }
+        .city-item {
+            padding: 5px;
+            cursor: pointer;
+        }
+        .city-item:hover {
+            background-color: #f0f0f0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="clockContainer"></div>
+
+    <script>
+        const cities = moment.tz.names();
+        const clockContainer = document.getElementById('clockContainer');
+
+        function createClock(id) {
+            const clock = document.createElement('div');
+            clock.classList.add('clock');
+            clock.innerHTML = `
+                <h2 id="clockLabel${id}">Clock ${id}</h2>
+                <div class="time" id="time${id}"></div>
+                <input type="text" class="city-search" id="citySearch${id}" placeholder="Search for a city">
+                <div class="city-list" id="cityList${id}"></div>
+            `;
+            clockContainer.appendChild(clock);
+
+            const searchInput = clock.querySelector(`#citySearch${id}`);
+            const cityList = clock.querySelector(`#cityList${id}`);
+
+            searchInput.addEventListener('input', (e) => {
+                const searchTerm = e.target.value.toLowerCase();
+                const filteredCities = cities.filter(city => city.toLowerCase().includes(searchTerm));
+                displayCities(id, filteredCities);
+            });
+
+            searchInput.addEventListener('focus', () => {
+                cityList.style.display = 'block';
+            });
+
+            document.addEventListener('click', (e) => {
+                if (e.target !== searchInput && e.target !== cityList) {
+                    cityList.style.display = 'none';
+                }
+            });
+        }
+
+        function displayCities(id, filteredCities) {
+            const cityList = document.getElementById(`cityList${id}`);
+            cityList.innerHTML = '';
+            cityList.style.display = 'block';
+
+            filteredCities.forEach(city => {
+                const cityItem = document.createElement('div');
+                cityItem.classList.add('city-item');
+                cityItem.textContent = city;
+                cityItem.addEventListener('click', () => {
+                    updateClock(id, city);
+                    document.getElementById(`citySearch${id}`).value = city;
+                    cityList.style.display = 'none';
+                });
+                cityList.appendChild(cityItem);
+            });
+        }
+
+        function updateClock(id, timezone) {
+            const timeElement = document.getElementById(`time${id}`);
+            const labelElement = document.getElementById(`clockLabel${id}`);
+            labelElement.textContent = timezone || `Clock ${id}`;
+
+            clearInterval(window[`interval${id}`]);
+            window[`interval${id}`] = setInterval(() => {
+                const time = moment().tz(timezone).format('HH:mm:ss');
+                timeElement.textContent = timezone ? `${time}` : 'Select a city';
+            }, 1000);
+        }
+
+        function initializeClocks() {
+            for (let i = 1; i <= 4; i++) {
+                createClock(i);
+            }
+        }
+
+        initializeClocks();
+    </script>
+</body>
+</html>

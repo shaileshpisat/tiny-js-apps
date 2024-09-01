@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        .calculator {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            max-width: 300px;
+            width: 100%;
+        }
+        #display {
+            width: 100%;
+            height: 50px;
+            font-size: 24px;
+            text-align: right;
+            margin-bottom: 10px;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+        button {
+            padding: 15px;
+            font-size: 18px;
+            border: none;
+            background-color: #f0f0f0;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        button:hover {
+            background-color: #e0e0e0;
+        }
+        .operator {
+            background-color: #ff9800;
+            color: white;
+        }
+        .operator:hover {
+            background-color: #f57c00;
+        }
+        #equals {
+            background-color: #4caf50;
+            color: white;
+        }
+        #equals:hover {
+            background-color: #45a049;
+        }
+        #clear, #backspace {
+            background-color: #f44336;
+            color: white;
+        }
+        #clear:hover, #backspace:hover {
+            background-color: #d32f2f;
+        }
+        .memory {
+            background-color: #2196f3;
+            color: white;
+        }
+        .memory:hover {
+            background-color: #1e88e5;
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <input type="text" id="display" readonly>
+        <div class="buttons">
+            <button onclick="appendToDisplay('7')">7</button>
+            <button onclick="appendToDisplay('8')">8</button>
+            <button onclick="appendToDisplay('9')">9</button>
+            <button class="operator" onclick="appendToDisplay('+')">+</button>
+            <button onclick="appendToDisplay('4')">4</button>
+            <button onclick="appendToDisplay('5')">5</button>
+            <button onclick="appendToDisplay('6')">6</button>
+            <button class="operator" onclick="appendToDisplay('-')">-</button>
+            <button onclick="appendToDisplay('1')">1</button>
+            <button onclick="appendToDisplay('2')">2</button>
+            <button onclick="appendToDisplay('3')">3</button>
+            <button class="operator" onclick="appendToDisplay('*')">*</button>
+            <button onclick="appendToDisplay('0')">0</button>
+            <button onclick="appendToDisplay('.')">.</button>
+            <button id="equals" onclick="calculate()">=</button>
+            <button class="operator" onclick="appendToDisplay('/')">/</button>
+            <button id="clear" onclick="clearDisplay()">C</button>
+            <button id="backspace" onclick="backspace()">⌫</button>
+            <button class="memory" onclick="memoryAdd()">M+</button>
+            <button class="memory" onclick="memorySubtract()">M-</button>
+        </div>
+    </div>
+
+    <script>
+        class Calculator {
+            constructor() {
+                this.result = 0;
+                this.memory = 0;
+            }
+
+            add(number) {
+                this.result += number;
+                return this;
+            }
+
+            subtract(number) {
+                this.result -= number;
+                return this;
+            }
+
+            multiply(number) {
+                this.result *= number;
+                return this;
+            }
+
+            divide(number) {
+                if (number === 0) {
+                    throw new Error("Cannot divide by zero");
+                }
+                this.result /= number;
+                return this;
+            }
+
+            clear() {
+                this.result = 0;
+                return this;
+            }
+
+            getResult() {
+                return this.result;
+            }
+
+            memoryAdd(number) {
+                this.memory += number;
+            }
+
+            memorySubtract(number) {
+                this.memory -= number;
+            }
+
+            getMemory() {
+                return this.memory;
+            }
+        }
+
+        const calculator = new Calculator();
+        const display = document.getElementById('display');
+
+        function appendToDisplay(value) {
+            display.value += value;
+        }
+
+        function clearDisplay() {
+            display.value = '';
+            calculator.clear();
+        }
+
+        function calculate() {
+            try {
+                const result = eval(display.value);
+                calculator.clear().add(result);
+                display.value = calculator.getResult();
+            } catch (error) {
+                display.value = 'Error';
+            }
+        }
+
+        function backspace() {
+            display.value = display.value.slice(0, -1);
+        }
+
+        function memoryAdd() {
+            calculate();
+            calculator.memoryAdd(parseFloat(display.value) || 0);
+            display.value = '';
+        }
+
+        function memorySubtract() {
+            calculate();
+            calculator.memorySubtract(parseFloat(display.value) || 0);
+            display.value = '';
+        }
+    </script>
+</body>
+</html>
